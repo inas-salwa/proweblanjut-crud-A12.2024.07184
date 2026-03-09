@@ -35,7 +35,7 @@ include __DIR__ . '/../includes/header.php';
                 <?php if($row['foto'] && file_exists(UPLOAD_DIR.$row['foto'])): ?>
                     <img src="<?= BASE_URL ?>uploads/<?= $row['foto'] ?>" class="photo-thumb">
                 <?php else: ?>
-                    <div style="width:50px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;justify-content:center;">📷</div>
+                    <div style="width:50px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;"></div>
                 <?php endif; ?>
             </td>
             <td><?= htmlspecialchars($row['kode_barang']) ?></td>

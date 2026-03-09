@@ -32,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!in_array($_FILES['foto']['type'], $allowed)) $errors[] = 'Format foto tidak valid.';
         if ($_FILES['foto']['size'] > 2*1024*1024) $errors[] = 'Ukuran foto maks 2MB.';
         if (empty($errors)) {
-            // Hapus foto lama
             if ($row['foto'] && file_exists(UPLOAD_DIR . $row['foto'])) {
                 unlink(UPLOAD_DIR . $row['foto']);
             }

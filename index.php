@@ -8,12 +8,12 @@ include __DIR__ . '/includes/header.php';
 ?>
 
 <div class="card">
-    <div class="card-title">📊 Dashboard</div>
+    <div class="card-title">Dashboard</div>
     <p>Total Jenis Barang: <strong><?= $total ?></strong> &nbsp;|&nbsp; Total Stok: <strong><?= number_format($stok) ?></strong></p>
 </div>
 
 <div class="card">
-    <div class="card-title">📋 Barang Terbaru</div>
+    <div class="card-title">Barang Terbaru</div>
     <table>
         <thead><tr><th>No</th><th>Kode</th><th>Nama Barang</th><th>Stok</th><th>Aksi</th></tr></thead>
         <tbody>
