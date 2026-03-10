@@ -28,7 +28,7 @@ include __DIR__ . '/../includes/header.php';
             </tr>
         </thead>
         <tbody>
-        <?php $no=1; while($row=$result->fetch_assoc()): ?>
+        <?php if(count($result) > 0): $no=1; foreach($result as $row): ?>
         <tr>
             <td><?= $no++ ?></td>
             <td>
@@ -49,7 +49,9 @@ include __DIR__ . '/../includes/header.php';
                    onclick="return confirm('Yakin hapus barang ini?')">Hapus</a>
             </td>
         </tr>
-        <?php endwhile; ?>
+        <?php endforeach; else: ?>
+            <tr><td colspan="8" style="text-align:center;color:#94a3b9;padding:1,5rem;">Belum ada data barang</td></tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>

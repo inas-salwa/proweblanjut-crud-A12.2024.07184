@@ -39,18 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO barang
+        $stmt = $pdo->prepare("INSERT INTO barang
             (kode_barang,nama_barang,satuan,harga_beli,harga_jual,jumlah,tanggal_masuk,keterangan,foto)
             VALUES (?,?,?,?,?,?,?,?,?)");
-        $stmt->bind_param('sssddisss',
-            $data['kode_barang'],$data['nama_barang'],$data['satuan'],
-            $data['harga_beli'],$data['harga_jual'],$data['jumlah'],
-            $data['tanggal_masuk'],$data['keterangan'],$foto);
-        if ($stmt->execute()) {
+        if ($stmt->execute([
+            $data['kode_barang'], $data['nama_barang'], $data['satuan'],
+            $data['harga_beli'],  $data['harga_jual'],  $data['jumlah'],
+            $data['tanggal_masuk'], $data['keterangan'], $foto
+        ])) {
             header('Location: ' . BASE_URL . 'barang/index.php?msg=success');
             exit;
         } else {
-            $errors[] = 'Gagal menyimpan: ' . $conn->error;
+            $errors[] = 'Gagal menyimpan data.';
         }
     }
 }
@@ -58,7 +58,7 @@ include __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="card">
-    <div class="card-title">Tambah Barang Baru</div>
+    <div class="card-title">➕ Tambah Barang Baru</div>
 
     <?php if (!empty($errors)): ?>
         <div class="alert alert-danger">
@@ -114,7 +114,7 @@ include __DIR__ . '/../includes/header.php';
             <textarea name="keterangan" class="form-control" rows="3"><?= htmlspecialchars($data['keterangan']) ?></textarea>
         </div>
         <div style="display:flex;gap:.8rem;">
-            <button type="submit" class="btn btn-success">Simpan</button>
+            <button type="submit" class="btn btn-success">💾 Simpan</button>
             <a href="<?= BASE_URL ?>barang/index.php" class="btn btn-secondary">Batal</a>
         </div>
     </form>

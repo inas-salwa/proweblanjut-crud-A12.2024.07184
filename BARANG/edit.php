@@ -1,32 +1,34 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 
-$id = intval($_GET['id'] ?? 0);
-if (!$id) { header('Location: ' . BASE_URL. 'barang/index.php'); exit; } 
+$id  = intval($_GET['id'] ?? 0);
+if (!$id) { header('Location: ' . BASE_URL . 'barang/index.php'); exit; }
 
-$row = $conn->query("SELECT * FROM barang WHERE id_barang=$id")->fetch_assoc();
+$stmt = $pdo->prepare("SELECT * FROM barang WHERE id_barang = ?");
+$stmt->execute([$id]);
+$row = $stmt->fetch();
 if (!$row) { header('Location: ' . BASE_URL . 'barang/index.php'); exit; }
 
 $errors = [];
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $kode_barang = trim($_POST['kode_barang'] ?? '');
-    $nama_barang = trim($_POST['nama_barang'] ?? '');
-    $satuan = trim($_POST['satuan'] ?? '');
-    $harga_beli = trim($_POST['harga_beli'] ?? '');
-    $harga_jual = trim($_POST['harga_jual'] ?? '');
-    $jumlah = trim($_POST['jumlah'] ?? '');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $kode_barang   = trim($_POST['kode_barang'] ?? '');
+    $nama_barang   = trim($_POST['nama_barang'] ?? '');
+    $satuan        = trim($_POST['satuan'] ?? '');
+    $harga_beli    = trim($_POST['harga_beli'] ?? '');
+    $harga_jual    = trim($_POST['harga_jual'] ?? '');
+    $jumlah        = trim($_POST['jumlah'] ?? '');
     $tanggal_masuk = trim($_POST['tanggal_masuk'] ?? '');
-    $keterangan = trim($_POST['keterangan'] ?? '');
+    $keterangan    = trim($_POST['keterangan'] ?? '');
 
-    if ($kode_barang == '') $errors[] = 'Kode barang wajib diisi.';
-    if ($nama_barang == '') $errors[] = 'Nama barang wajib diisi.';
-    if ($satuan == '') $errors[] = 'Satuan wajib diisi.';
-    if ($harga_beli == '') $errors[] = 'Harga beli wajib diisi.';
-    if ($harga_jual == '') $errors[] = 'Harga jual wajib diisi.';
-    if ($jumlah =='') $errors[] = 'Jumlah wajib diisi.';
+    if ($kode_barang === '') $errors[] = 'Kode barang wajib diisi.';
+    if ($nama_barang === '') $errors[] = 'Nama barang wajib diisi.';
+    if ($satuan      === '') $errors[] = 'Satuan wajib diisi.';
+    if ($harga_beli  === '') $errors[] = 'Harga beli wajib diisi.';
+    if ($harga_jual  === '') $errors[] = 'Harga jual wajib diisi.';
+    if ($jumlah      === '') $errors[] = 'Jumlah wajib diisi.';
 
-     $foto = $row['foto'];
+    $foto = $row['foto'];
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
         $allowed = ['image/jpeg','image/png','image/gif','image/webp'];
         if (!in_array($_FILES['foto']['type'], $allowed)) $errors[] = 'Format foto tidak valid.';
@@ -45,15 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $conn->prepare("UPDATE barang SET
-        kode_barang=?, nama_barang=?, satuan=?, harga_beli=?, harga_jual=?, jumlah=?, tanggal_masuk=?, keterangan=?, foto=? WHERE id_barang=?");
-        $stmt->bind_param('ssddissi',
-        $kode_barang, $nama_barang, $satuan, $harga_beli, $harga_jual, $jumlah, $tanggal_masuk, $keterangan, $foto, $id);
-        if ($stmt->excute()) {
-            header('Location: '. BASE_URL . 'barang/index.php?msg=success');
-            exiit;
+        $stmt = $pdo->prepare("UPDATE barang SET
+            kode_barang=?, nama_barang=?, satuan=?, harga_beli=?,
+            harga_jual=?, jumlah=?, tanggal_masuk=?, keterangan=?, foto=?
+            WHERE id_barang=?");
+        if ($stmt->execute([
+            $kode_barang, $nama_barang, $satuan,
+            $harga_beli, $harga_jual, $jumlah,
+            $tanggal_masuk, $keterangan, $foto, $id
+        ])) {
+            header('Location: ' . BASE_URL . 'barang/index.php?msg=success');
+            exit;
         } else {
-            $errors[] = 'Gagal Update: ' . $conn->errors;
+            $errors[] = 'Gagal update data.';
         }
     }
 }
@@ -62,11 +68,11 @@ include __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="card">
-    <div class="card-title">Edit Barang</div>
+    <div class="card-title">✏️ Edit Barang</div>
 
     <?php if (!empty($errors)): ?>
         <div class="alert alert-danger">
-            <?php foreach ($errors as $e): ?>$bull; <?= htmlspecialchars($e) ?><br><?php endforeach; ?>
+            <?php foreach ($errors as $e): ?>&bull; <?= htmlspecialchars($e) ?><br><?php endforeach; ?>
         </div>
     <?php endif; ?>
 
@@ -80,25 +86,31 @@ include __DIR__ . '/../includes/header.php';
                 <label class="form-label">Nama Barang *</label>
                 <input type="text" name="nama_barang" class="form-control" value="<?= htmlspecialchars($row['nama_barang']) ?>">
             </div>
+        </div>
+        <div class="form-row">
             <div class="form-group">
                 <label class="form-label">Satuan *</label>
                 <input type="text" name="satuan" class="form-control" value="<?= htmlspecialchars($row['satuan']) ?>">
             </div>
             <div class="form-group">
-                <label class="form-label">Jumlah stok *</label>
-                <input type="text" name="jumlah" class="form-control" value="<?= htmlspecialchars($row['jumlah']) ?>">
+                <label class="form-label">Jumlah Stok *</label>
+                <input type="number" name="jumlah" class="form-control" value="<?= htmlspecialchars($row['jumlah']) ?>" min="0">
             </div>
+        </div>
+        <div class="form-row">
             <div class="form-group">
-                <label class="form-label">Harga beli (Rp) *</label>
-                <input type="text" name="harga_beli" class="form-control" value="<?= htmlspecialchars($row['harga_beli']) ?>">
+                <label class="form-label">Harga Beli (Rp) *</label>
+                <input type="number" name="harga_beli" class="form-control" value="<?= htmlspecialchars($row['harga_beli']) ?>" min="0">
             </div>
             <div class="form-group">
                 <label class="form-label">Harga Jual (Rp) *</label>
-                <input type="text" name="harga_jual" class="form-control" value="<?= htmlspecialchars($row['harga_jual']) ?>">
+                <input type="number" name="harga_jual" class="form-control" value="<?= htmlspecialchars($row['harga_jual']) ?>" min="0">
             </div>
+        </div>
+        <div class="form-row">
             <div class="form-group">
                 <label class="form-label">Tanggal Masuk</label>
-                <input type="text" name="tanggal_masuk" class="form-control" value="<?= htmlspecialchars($row['tanggal_masuk']) ?>">
+                <input type="date" name="tanggal_masuk" class="form-control" value="<?= htmlspecialchars($row['tanggal_masuk']) ?>">
             </div>
             <div class="form-group">
                 <label class="form-label">Foto Barang (kosongkan jika tidak diganti)</label>
@@ -116,22 +128,21 @@ include __DIR__ . '/../includes/header.php';
             <textarea name="keterangan" class="form-control" rows="3"><?= htmlspecialchars($row['keterangan']) ?></textarea>
         </div>
         <div style="display:flex;gap:.8rem;">
-            <button type="submit" class="btn btn-warning">Update</button>
-            <a href="<?= BASE_URL?>barang/index.php" class="btn btn-secondary">Batal</a>
-        </div>
+            <button type="submit" class="btn btn-warning">💾 Update</button>
+            <a href="<?= BASE_URL ?>barang/index.php" class="btn btn-secondary">Batal</a>
         </div>
     </form>
 </div>
 
 <script>
-    function previewFoto(input) {
-        const preview = document.getElementById('preview');
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; }
-            reader.readAsDataURL(input.files[0]);
-        }
+function previewFoto(input) {
+    const preview = document.getElementById('preview');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; }
+        reader.readAsDataURL(input.files[0]);
     }
+}
 </script>
 
-<?php include __DIR__ . '/../includes/footer.php';?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

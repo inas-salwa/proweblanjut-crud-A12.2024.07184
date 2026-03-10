@@ -17,7 +17,7 @@ include __DIR__ . '/includes/header.php';
     <table>
         <thead><tr><th>No</th><th>Kode</th><th>Nama Barang</th><th>Stok</th><th>Aksi</th></tr></thead>
         <tbody>
-        <?php if($recent->num_rows > 0): $no=1; while($row=$recent->fetch_assoc()): ?>
+        <?php if(count($recent) > 0): $no=1; foreach($recent as $row): ?>
         <tr>
             <td><?= $no++ ?></td>
             <td><?= htmlspecialchars($row['kode_barang']) ?></td>
@@ -25,7 +25,7 @@ include __DIR__ . '/includes/header.php';
             <td><?= $row['jumlah'] ?> <?= $row['satuan'] ?></td>
             <td><a href="<?= BASE_URL ?>barang/index.php" class="btn btn-primary btn-sm">Lihat Semua</a></td>
         </tr>
-        <?php endwhile; else: ?>
+       <?php endforeach; else: ?>
         <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">Belum ada data barang.</td></tr>
         <?php endif; ?>
         </tbody>
