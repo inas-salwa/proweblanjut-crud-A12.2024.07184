@@ -1,9 +1,8 @@
 <?php
 require_once __DIR__ . '/includes/config.php';
-$total  = $conn->query("SELECT COUNT(*) FROM barang")->fetch_row()[0];
-$result = $conn->query("SELECT SUM(jumlah) FROM barang")->fetch_row()[0];
-$stok   = $result ?? 0;
-$recent = $conn->query("SELECT * FROM barang ORDER BY id_barang DESC LIMIT 5");
+$total  = $pdo->query("SELECT COUNT(*) FROM barang")->fetchColumn();
+$stok   = $pdo->query("SELECT SUM(jumlah) FROM barang")->fetchColumn() ?? 0;
+$recent = $pdo->query("SELECT * FROM barang ORDER BY id_barang DESC LIMIT 5")->fetchAll();
 include __DIR__ . '/includes/header.php';
 ?>
 

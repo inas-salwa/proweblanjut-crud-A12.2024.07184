@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
-$result = $conn->query("SELECT * FROM barang ORDER BY id_barang DESC");
+$result = $pdo->query("SELECT * FROM barang ORDER BY id_barang DESC")->fetchAll();
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -35,7 +35,7 @@ include __DIR__ . '/../includes/header.php';
                 <?php if($row['foto'] && file_exists(UPLOAD_DIR.$row['foto'])): ?>
                     <img src="<?= BASE_URL ?>uploads/<?= $row['foto'] ?>" class="photo-thumb">
                 <?php else: ?>
-                    <div style="width:50px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;"></div>
+                    <div style="width:50px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;justify-content:center;">📷</div>
                 <?php endif; ?>
             </td>
             <td><?= htmlspecialchars($row['kode_barang']) ?></td>
@@ -50,8 +50,8 @@ include __DIR__ . '/../includes/header.php';
             </td>
         </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="8" style="text-align:center;color:#94a3b9;padding:1,5rem;">Belum ada data barang</td></tr>
-            <?php endif; ?>
+        <tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:1.5rem;">Belum ada data barang.</td></tr>
+        <?php endif; ?>
         </tbody>
     </table>
 </div>
