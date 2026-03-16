@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($data['kode_barang'] === '') $errors[] = 'Kode barang wajib diisi.';
     if ($data['nama_barang'] === '') $errors[] = 'Nama barang wajib diisi.';
+    if (!preg_match('/^[a-zA-Z\s]+$/', $data['nama_barang'])) $errors[] = 'Nama barang hanya boleh berisi huruf.';
     if ($data['satuan']      === '') $errors[] = 'Satuan wajib diisi.';
     if ($data['harga_beli']  === '') $errors[] = 'Harga beli wajib diisi.';
     if ($data['harga_jual']  === '') $errors[] = 'Harga jual wajib diisi.';
@@ -58,7 +59,7 @@ include __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="card">
-    <div class="card-title">➕ Tambah Barang Baru</div>
+    <div class="card-title"> Tambah Barang Baru</div>
 
     <?php if (!empty($errors)): ?>
         <div class="alert alert-danger">
@@ -114,7 +115,7 @@ include __DIR__ . '/../includes/header.php';
             <textarea name="keterangan" class="form-control" rows="3"><?= htmlspecialchars($data['keterangan']) ?></textarea>
         </div>
         <div style="display:flex;gap:.8rem;">
-            <button type="submit" class="btn btn-success">💾 Simpan</button>
+            <button type="submit" class="btn btn-success"> Simpan</button>
             <a href="<?= BASE_URL ?>barang/index.php" class="btn btn-secondary">Batal</a>
         </div>
     </form>

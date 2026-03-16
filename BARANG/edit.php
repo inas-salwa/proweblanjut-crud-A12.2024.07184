@@ -68,7 +68,7 @@ include __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="card">
-    <div class="card-title">✏️ Edit Barang</div>
+    <div class="card-title"> Edit Barang</div>
 
     <?php if (!empty($errors)): ?>
         <div class="alert alert-danger">
@@ -128,7 +128,7 @@ include __DIR__ . '/../includes/header.php';
             <textarea name="keterangan" class="form-control" rows="3"><?= htmlspecialchars($row['keterangan']) ?></textarea>
         </div>
         <div style="display:flex;gap:.8rem;">
-            <button type="submit" class="btn btn-warning">💾 Update</button>
+            <button type="submit" class="btn btn-warning">Update</button>
             <a href="<?= BASE_URL ?>barang/index.php" class="btn btn-secondary">Batal</a>
         </div>
     </form>
