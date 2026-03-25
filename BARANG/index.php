@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/config.php';
 $result = $pdo->query("SELECT * FROM barang ORDER BY id_barang DESC")->fetchAll();
 include __DIR__ . '/../includes/header.php';
 ?>

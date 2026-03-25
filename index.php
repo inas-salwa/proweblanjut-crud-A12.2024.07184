@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/config.php';
 $total  = $pdo->query("SELECT COUNT(*) FROM barang")->fetchColumn();
 $stok   = $pdo->query("SELECT SUM(jumlah) FROM barang")->fetchColumn() ?? 0;

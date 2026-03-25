@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/config.php';
 $errors = [];
 $data = ['kode_barang'=>'','nama_barang'=>'','satuan'=>'','harga_beli'=>'',
