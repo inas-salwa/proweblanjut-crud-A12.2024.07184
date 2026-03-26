@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/auth.php';
+session_start();
 require_once __DIR__ . '/includes/config.php';
 $total  = $pdo->query("SELECT COUNT(*) FROM barang")->fetchColumn();
 $stok   = $pdo->query("SELECT SUM(jumlah) FROM barang")->fetchColumn() ?? 0;
@@ -23,9 +23,15 @@ include __DIR__ . '/includes/header.php';
             <td><?= htmlspecialchars($row['kode_barang']) ?></td>
             <td><?= htmlspecialchars($row['nama_barang']) ?></td>
             <td><?= $row['jumlah'] ?> <?= $row['satuan'] ?></td>
-            <td><a href="<?= BASE_URL ?>barang/index.php" class="btn btn-primary btn-sm">Lihat Semua</a></td>
+            <td>
+                <?php if(isset($_SESSION['username'])): ?>
+                    <a href="/inventory/barang/index.php" class="btn btn-primary btn-sm">Lihat Semua</a>
+                    <?php else: ?>
+                        <a href="/inventory/login.php" class="btn btn-secondary btn-sm">Login untuk akses</a>
+                    <?php endif; ?>
+            </td>
         </tr>
-       <?php endforeach; else: ?>
+        <?php endforeach; else: ?>
         <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">Belum ada data barang.</td></tr>
         <?php endif; ?>
         </tbody>

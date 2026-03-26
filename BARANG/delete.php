@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/config.php';
+require_once 'C:/xampp/htdocs/INVENTORY/includes/auth.php';
+require_once 'C:/xampp/htdocs/INVENTORY/includes/config.php';
 
 $id = intval($_GET['id'] ?? 0);
 if (!$id) { header('Location: ' . BASE_URL . 'barang/index.php'); exit; }

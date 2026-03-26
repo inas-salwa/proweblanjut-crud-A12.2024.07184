@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/config.php';
+require_once 'C:/xampp/htdocs/INVENTORY/includes/auth.php';
+require_once 'C:/xampp/htdocs/INVENTORY/includes/config.php';
 $errors = [];
 $data = ['kode_barang'=>'','nama_barang'=>'','satuan'=>'','harga_beli'=>'',
          'harga_jual'=>'','jumlah'=>'','tanggal_masuk'=>'','keterangan'=>''];

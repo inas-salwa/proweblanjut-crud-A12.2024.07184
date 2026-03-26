@@ -1,4 +1,4 @@
-<?php $current = basename($_SERVER['PHP_SELF']); ?>
+<?php if(!isset($_SESSION)) session_start(); ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,12 +12,13 @@
         <a href="/inventory/index.php" class="brand">Inventaris Barang</a>
         <nav style="display:flex;align-items:center;gap:1rem;">
             <a href="/inventory/index.php">Beranda</a>
+            <?php if(isset($_SESSION['username'])): ?>
             <a href="/inventory/barang/index.php">Data Barang</a>
             <a href="/inventory/barang/create.php">Tambah Barang</a>
-            <span style="color:rgba(255,255,255,.7);font-size:.85rem;">
-                <?= htmlspecialchars($_SESSION['nama'] ?? '') ?>
-            </span>
-            <a href="/inventory/logout.php" style="background:rgba(255,255,255,.2);padding:.3rem .8rem;border-radius:6px;color:#fff;font-size:.85rem;">Logout</a>
+           <a href="/inventory/logout.php" style="background: #8cae91;padding:.3rem .8rem;border-radius:6px;color:#fff;font-size:.85rem;">Logout</a>
+            <?php else: ?>
+            <a href="/inventory/login.php" style="background: #8cae91;padding:.3rem .8rem;border-radius:6px;color:#fff;font-size:.85rem;">Login</a>
+        <?php endif; ?>
         </nav>
     </nav>
     <div class="container"></div>
