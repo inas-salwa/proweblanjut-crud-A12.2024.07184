@@ -2,8 +2,21 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/includes/config.php';
 
+if (!isset($_SESSION['username']) && isset($_COOKIE['username'])) {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->execute([$_COOKIE['username']]);
+    $user = $stmt->fetch();
+
+    if ($user) {
+        $_SESSION['user_id'] = $user['id_user'];
+        $_SESSION['nama'] = $user['nama'];
+        $_SESSION['username'] = $user['username'];
+    }
+}
+
 if (isset($_SESSION['username'])) {
     header('Location: /inventory/index.php');
+    exit;
 }
 
 $error = '';
@@ -23,6 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_id'] =  $user['id_user'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['nama'] = $user['nama'];
+
+            if (isset($_POST['remember'])) {
+                setcookie("username", $user['username'], time() + (86400 * 7), "/");
+            }
 
             header('Location: /inventory/index.php');
             exit;
@@ -62,6 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="form-group">
             <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control" placeholder="Masukan Password">
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+            <label>
+                <input type="checkbox" name="remember"> Remember Me
+            </label>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem;">Login</button>
     </form>
