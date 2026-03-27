@@ -48,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 <div class="login-box">
-    <div class="login-tittle">Inventaris Barang</div>
     <div class="login-sub">Silahkan Login untuk melanjutkan</div>
 
     <?php if ($error): ?>
