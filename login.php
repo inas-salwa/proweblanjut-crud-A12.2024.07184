@@ -91,6 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem;">Login</button>
     </form>
+    <div style="text-align:center;margin-top:1rem;font-size:.85rem;color:#64748b;">
+    Belum punya akun? <a href="/inventory/register.php" style="color:#2563eb;font-weight:600;">Daftar di sini</a>
+</div>
 </div>
 </body>
 </html>

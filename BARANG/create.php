@@ -1,6 +1,7 @@
 <?php
 require_once 'C:/xampp/htdocs/INVENTORY/includes/auth.php';
 require_once 'C:/xampp/htdocs/INVENTORY/includes/config.php';
+
 $errors = [];
 $data = ['kode_barang'=>'','nama_barang'=>'','satuan'=>'','harga_beli'=>'',
          'harga_jual'=>'','jumlah'=>'','tanggal_masuk'=>'','keterangan'=>''];
@@ -23,21 +24,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($data['harga_jual']  === '') $errors[] = 'Harga jual wajib diisi.';
     if ($data['jumlah']      === '') $errors[] = 'Jumlah wajib diisi.';
 
-    $foto = '';
-    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-        $allowed = ['image/jpeg','image/png','image/gif','image/webp'];
-        if (!in_array($_FILES['foto']['type'], $allowed)) $errors[] = 'Format foto tidak valid.';
-        if ($_FILES['foto']['size'] > 2*1024*1024) $errors[] = 'Ukuran foto maks 2MB.';
-        if (empty($errors)) {
-            $ext  = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-            $foto = uniqid('brg_') . '.' . strtolower($ext);
-            if (!move_uploaded_file($_FILES['foto']['tmp_name'], UPLOAD_DIR . $foto)) {
-                $errors[] = 'Gagal mengupload foto.';
-                $foto = '';
-            }
-        }
-    } else {
+    $foto_thumb = '';
+
+    if (!isset($_FILES['foto']) || $_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
         $errors[] = 'Foto barang wajib diupload.';
+    } else {
+        $allowed_mime = ['image/jpeg', 'image/png'];
+        $mime         = mime_content_type($_FILES['foto']['tmp_name']);
+        $max_size     = 2 * 1024 * 1024; // 2MB
+
+        if (!in_array($mime, $allowed_mime)) $errors[] = 'Format foto tidak valid. Gunakan JPG atau PNG.';
+        if ($_FILES['foto']['size'] > $max_size) $errors[] = 'Ukuran foto maksimal 2MB.';
+
+        if (empty($errors)) {
+            $dir_original = 'C:/xampp/htdocs/INVENTORY/uploads/original/';
+            $dir_thumb    = 'C:/xampp/htdocs/INVENTORY/uploads/thumbs/';
+
+            if (!is_dir($dir_original)) mkdir($dir_original, 0777, true);
+            if (!is_dir($dir_thumb))    mkdir($dir_thumb,    0777, true);
+
+            $filename      = time() . '_' . uniqid() . '.jpg';
+            $path_original = $dir_original . $filename;
+            $path_thumb    = $dir_thumb    . 'thumb_' . $filename;
+
+            list($width, $height) = getimagesize($_FILES['foto']['tmp_name']);
+
+            if ($mime === 'image/jpeg') {
+                $src = imagecreatefromjpeg($_FILES['foto']['tmp_name']);
+            } else {
+                $src = imagecreatefrompng($_FILES['foto']['tmp_name']);
+            }
+
+            $max_w = 1024; $max_h = 768;
+            if ($width > $max_w || $height > $max_h) {
+                $scale   = min($max_w / $width, $max_h / $height);
+                $new_w   = floor($width  * $scale);
+                $new_h   = floor($height * $scale);
+                $resized = imagecreatetruecolor($new_w, $new_h);
+                imagecopyresampled($resized, $src, 0, 0, 0, 0, $new_w, $new_h, $width, $height);
+                imagejpeg($resized, $path_original, 90);
+                imagedestroy($resized);
+                $width = $new_w; $height = $new_h;
+                $src = imagecreatefromjpeg($path_original);
+            } else {
+                imagejpeg($src, $path_original, 90);
+            }
+
+            $thumb = imagecreatetruecolor(200, 200);
+            if ($width > $height) {
+                $crop_x = ($width - $height) / 2;
+                $crop_y = 0;
+                $crop_s = $height;
+            } else {
+                $crop_x = 0;
+                $crop_y = ($height - $width) / 2;
+                $crop_s = $width;
+            }
+            imagecopyresampled($thumb, $src, 0, 0, $crop_x, $crop_y, 200, 200, $crop_s, $crop_s);
+            imagejpeg($thumb, $path_thumb, 90);
+
+            imagedestroy($src);
+            imagedestroy($thumb);
+
+            $foto_thumb = 'uploads/thumbs/thumb_' . $filename;
+        }
     }
 
     if (empty($errors)) {
@@ -47,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute([
             $data['kode_barang'], $data['nama_barang'], $data['satuan'],
             $data['harga_beli'],  $data['harga_jual'],  $data['jumlah'],
-            $data['tanggal_masuk'], $data['keterangan'], $foto
+            $data['tanggal_masuk'], $data['keterangan'], $foto_thumb
         ])) {
             header('Location: ' . BASE_URL . 'barang/index.php?msg=success');
             exit;
@@ -56,11 +106,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-include __DIR__ . '/../includes/header.php';
+
+include 'C:/xampp/htdocs/INVENTORY/includes/header.php';
 ?>
 
 <div class="card">
-    <div class="card-title"> Tambah Barang Baru</div>
+    <div class="card-title">Tambah Barang Baru</div>
 
     <?php if (!empty($errors)): ?>
         <div class="alert alert-danger">
@@ -77,6 +128,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="form-group">
                 <label class="form-label">Nama Barang *</label>
                 <input type="text" name="nama_barang" class="form-control" value="<?= htmlspecialchars($data['nama_barang']) ?>">
+                <small style="color:#64748b;">Hanya boleh huruf</small>
             </div>
         </div>
         <div class="form-row">
@@ -107,7 +159,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="form-group">
                 <label class="form-label">Foto Barang *</label>
                 <input type="file" name="foto" class="form-control" accept="image/*" onchange="previewFoto(this)">
-                <small style="color:#64748b;">Format: JPG/PNG, maks 2MB</small><br>
+                <small style="color:#64748b;">Format: JPG/PNG, maks 2MB. Thumbnail otomatis dibuat.</small><br>
                 <img id="preview" src="#" class="photo-preview" style="display:none;" alt="preview">
             </div>
         </div>
@@ -116,7 +168,7 @@ include __DIR__ . '/../includes/header.php';
             <textarea name="keterangan" class="form-control" rows="3"><?= htmlspecialchars($data['keterangan']) ?></textarea>
         </div>
         <div style="display:flex;gap:.8rem;">
-            <button type="submit" class="btn btn-success"> Simpan</button>
+            <button type="submit" class="btn btn-success">💾 Simpan</button>
             <a href="<?= BASE_URL ?>barang/index.php" class="btn btn-secondary">Batal</a>
         </div>
     </form>
@@ -133,4 +185,4 @@ function previewFoto(input) {
 }
 </script>
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php include 'C:/xampp/htdocs/INVENTORY/includes/footer.php'; ?>
